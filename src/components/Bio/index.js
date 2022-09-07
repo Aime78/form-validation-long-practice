@@ -3,6 +3,7 @@ function Bio({ value, onChange }) {
     <div>
       <label htmlFor="bio">Bio:</label>
       <textarea
+        placeholder="Your message here ..."
         id="bio"
         type="text"
         maxLength="280"

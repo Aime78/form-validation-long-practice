@@ -17,6 +17,7 @@ function App() {
   const [staff, setStaff] = useState("");
   const [bio, setBio] = useState("");
   const [signUp, setSignUp] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
   const [errorMessages, setErrorMessages] = useState({
     nameError: "",
     emailError: "",
@@ -37,10 +38,11 @@ function App() {
     if (phoneType.length === 0)
       errors.phoneTypeError = "Please provide a phone type";
 
-    setErrorMessages({ ...errors });
-  }, [name, email, phone, phoneType]);
+    if (staff.length === 0)
+      errors.staffError = "Please provide a staff category";
 
-  console.log(errorMessages);
+    setErrorMessages({ ...errors });
+  }, [name, email, phone, phoneType, staff]);
 
   useEffect(() => {
     if (isStaff.instructor) setStaff("instructor");
@@ -49,11 +51,14 @@ function App() {
 
   function onSubmit(e) {
     e.preventDefault();
-    // if (errorMessages.length > 0) {
-    //   window.alert("Please fill the required fields");
-    //   return;
-    // }
-
+    if (
+      errorMessages.nameError ||
+      errorMessages.emailError ||
+      errorMessages.phoneError ||
+      errorMessages.phoneTypeError ||
+      errorMessages.staffError
+    )
+      return;
     const time = new Date();
     const registration = {
       name,
@@ -66,34 +71,75 @@ function App() {
       submittedOn: `${time.toDateString()} ${time.toTimeString()}`,
     };
     console.log(JSON.stringify(registration));
+    setName("");
+    setEmail("");
+    setPhone("");
+    setPhoneType("");
+    setStaff("");
+    setBio("");
+    setSignUp(false);
+    setHasSubmitted(false);
   }
 
   return (
-    <div>
-      <form onSubmit={onSubmit}>
-        <Name value={name} onChange={(e) => setName(e.target.value)} />
-        <Email value={email} onChange={(e) => setEmail(e.target.value)} />
-        <Phone value={phone} onChange={(e) => setPhone(e.target.value)} />
+    <div className="container">
+      <form className="contact" onSubmit={onSubmit}>
+        <h2>Registration</h2>
+        <h3>Contact us for a custom quote</h3>
+        <h3 className="error-message">
+          {hasSubmitted &&
+            (errorMessages.nameError ||
+              errorMessages.emailError ||
+              errorMessages.phoneError ||
+              errorMessages.phoneTypeError ||
+              errorMessages.staffError) &&
+            "Please fill all required fields"}
+        </h3>
+        <Name
+          value={name}
+          submitted={hasSubmitted}
+          errorMessage={errorMessages.nameError}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <Email
+          value={email}
+          submitted={hasSubmitted}
+          errorMessage={errorMessages.emailError}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <Phone
+          value={phone}
+          submitted={hasSubmitted}
+          errorMessage={errorMessages.phoneError}
+          onChange={(e) => setPhone(e.target.value)}
+        />
         <PhoneType
           value={phoneType}
+          submitted={hasSubmitted}
+          errorMessage={errorMessages.phoneTypeError}
           onChange={(e) => setPhoneType(e.target.value)}
         />
-        <Staff
-          value="Instructor"
-          check={isStaff.instructor}
-          onChange={(e) => setIsStaff({ instructor: true, student: false })}
-        />
-        <Staff
-          value="Student"
-          check={isStaff.student}
-          onChange={(e) => setIsStaff({ instructor: false, student: true })}
-        />
+        <div>
+          <Staff
+            value="Instructor"
+            check={isStaff.instructor}
+            onChange={(e) => setIsStaff({ instructor: true, student: false })}
+          />
+          <Staff
+            value="Student"
+            check={isStaff.student}
+            onChange={(e) => setIsStaff({ instructor: false, student: true })}
+          />
+          <p className="error-message">
+            {hasSubmitted && !staff && errorMessages.staffError}
+          </p>
+        </div>
         <Bio value={bio} onChange={(e) => setBio(e.target.value)} />
         <SignUpForNotifications
           value={signUp}
           onChange={(e) => setSignUp(!signUp)}
         />
-        <button>Submit</button>
+        <button onClick={() => setHasSubmitted(true)}>Submit</button>
       </form>
     </div>
   );

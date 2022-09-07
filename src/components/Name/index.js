@@ -1,8 +1,17 @@
-function Name({ value, onChange }) {
+function Name({ value, onChange, submitted, errorMessage }) {
   return (
-    <div>
+    <div className="fieldset">
       <label htmlFor="name">Name:</label>
-      <input type="text" id="name" value={value} onChange={onChange} />
+      <input
+        className={submitted && !value ? "failed" : ""}
+        placeholder="Your name"
+        type="text"
+        id="name"
+        value={value}
+        onChange={onChange}
+      />
+
+      <p className="error-message">{submitted && !value && errorMessage}</p>
     </div>
   );
 }
